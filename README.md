@@ -25,15 +25,15 @@ a quick rundown on the most important points:
 
 Use the checklist below to customize this template for your project:
 
-- [ ] In `setup.py`:
-  - [ ] Update `name` on line 15
-  - [ ] Rename `cli-template` on line 21 to your project's name
 - [ ] Update all `[metadata]` in `setup.cfg` (see also <https://pypi.org/classifiers/>
       for a full list of classifiers)
-- [ ] Update `requirements.txt` (should be in sync with `install_requires` in `setup.cfg`)
-- [ ] Check `.gitignore` and add/remove items from this list
+- [ ] Configure your package name and version number in `src/__init__.py`
+- [ ] Update `requirements.txt` (keep it in sync with `install_requires` in
+      `setup.cfg` manually!)
+- [ ] Check `.gitignore` and add/remove items from this list (e.g. name of your
+      virtual environment)
 - [ ] Update `.gitattributes` (the default configuration here should be fine as is)
-- [ ] Choose a different license (GPLv3 by default)
+- [ ] Choose a different license (uses GPLv3 by default)
 - [ ] Update (or remove) `.markdownlint.json`
 - [ ] Rewrite this readme file
 
