@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 
-from src import utils
-
 import click
 import pretty_errors
 
+from src import utils
+from src.core import square_function
+
 from .__init__ import __version__, package_name
-from .core import square_function
+
 
 @click.group(invoke_without_command=True)
 @click.version_option(version=__version__, prog_name=package_name)
