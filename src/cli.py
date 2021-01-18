@@ -5,11 +5,11 @@ from src import utils
 import click
 import pretty_errors
 
-from .__init__ import __version__
+from .__init__ import __version__, package_name
 from .core import square_function
 
 @click.group(invoke_without_command=True)
-@click.version_option(version=__version__, prog_name='cli-template')
+@click.version_option(version=__version__, prog_name=package_name)
 @click.pass_context
 def cli(ctx):
     ctx.ensure_object(dict)
