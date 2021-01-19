@@ -28,8 +28,7 @@ Use the checklist below to customize this template for your project:
 - [ ] Update all `[metadata]` in `setup.cfg` (see also <https://pypi.org/classifiers/>
       for a full list of classifiers)
 - [ ] Configure your package name and version number in `src/__init__.py`
-- [ ] Update `requirements.txt` (keep it in sync with `install_requires` in
-      `setup.cfg` manually!)
+- [ ] Configure `requirements.txt`
 - [ ] Check `.gitignore` and add/remove items from this list (e.g. name of your
       virtual environment)
 - [ ] Update `.gitattributes` (the default configuration here should be fine as is)
