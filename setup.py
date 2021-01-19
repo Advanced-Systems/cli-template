@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
+import re
+
 from setuptools import setup
 
-parse = lambda lines, index: lines[index-1].split(' ')[2].replace('"', '').strip('\n')
-
 with open("src/__init__.py", encoding='utf8') as file_handler:
-    lines = file_handler.readlines()
-    version = parse(lines, 3)
-    package_name = parse(lines, 4)
+    lines = file_handler.read()
+    version = re.search(r'__version__ = "(.*?)"', lines).group(1)
+    package_name = re.search(r'package_name = "(.*?)"', lines).group(1)
 
 with open("requirements.txt", encoding='utf-8') as file_handler:
     packages = file_handler.read().splitlines()
