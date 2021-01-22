@@ -42,6 +42,14 @@ pip install -e .
 cli-template --version
 ```
 
+Alternatively, use
+
+```powershell
+install.ps1
+```
+
+to setup your dev environment.
+
 </details>
 
 ## Project Architecture
