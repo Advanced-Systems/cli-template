@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
 
 import click
-import pretty_errors
+from click import style
+
+try:
+    import pretty_errors
+except ImportError:
+    pass
 
 from src import utils
+from src.__init__ import __version__, package_name
 from src.core import square_function
-
-from .__init__ import __version__, package_name
 
 
 @click.group(invoke_without_command=True)
@@ -16,15 +20,16 @@ def cli(ctx):
     ctx.ensure_object(dict)
     ctx.obj['CONFIG'] = utils.read_configuration('src.data', 'config.json')
 
-@cli.command(help="Prints hello world.")
+@cli.command(help=style("Simple test command.", fg='bright_green'))
 @click.pass_context
 def test(ctx):
     config = ctx.obj['CONFIG']
 
     # imported from config
-    click.secho(config.get('Message', 'KeyNotFoundError'), fg='yellow')
+    click.secho('\n>>> ', nl=False, fg='yellow')
+    click.secho(config.get('Message', 'KeyNotFoundError'))
     
     # imported from core
-    click.echo("First ten powers of two:")
-    for x, y in enumerate(square_function(1, 10)):
-        click.echo(f"x={x+1}\ty={int(y)}")
+    click.secho("\nFirst Ten Powers of 2", fg='bright_magenta')
+    start, end = 1, 11
+    utils.print_dict('X Values', 'Y Values', dict(zip(range(start, end), square_function(start, end))))
