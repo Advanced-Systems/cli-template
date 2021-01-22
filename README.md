@@ -86,6 +86,7 @@ Use the checklist below to customize this template for your project's need:
       for a full list of classifiers)
 - [ ] Configure your package name and version number in `src/__init__.py`
 - [ ] Configure `requirements/common.txt` and `requirements/dev.txt`
+- [ ] Edit `MANIFEST.in` if necessary
 - [ ] Check `.gitignore` and add/remove items from this list (e.g. name of your
       virtual environment)
 - [ ] Update `.gitattributes` (the default configuration here should be fine as is)
