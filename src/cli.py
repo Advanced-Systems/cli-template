@@ -8,9 +8,8 @@ try:
 except ImportError:
     pass
 
-from src import utils
+from src import utils, core
 from src.__init__ import __version__, package_name
-from src.core import square_function
 
 
 @click.group(invoke_without_command=True)
@@ -32,4 +31,4 @@ def test(ctx):
     # imported from core
     click.secho("\nFirst Ten Powers of 2", fg='bright_magenta')
     start, end = 1, 11
-    utils.print_dict('X Values', 'Y Values', dict(zip(range(start, end), square_function(start, end))))
+    utils.print_dict('X Values', 'Y Values', dict(zip(range(start, end), core.square_function(start, end))))
