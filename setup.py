@@ -9,7 +9,7 @@ with open("src/__init__.py", encoding='utf8') as file_handler:
     version = re.search(r'__version__ = "(.*?)"', lines).group(1)
     package_name = re.search(r'package_name = "(.*?)"', lines).group(1)
 
-with open("requirements.txt", encoding='utf-8') as file_handler:
+with open("requirements/release.txt", encoding='utf-8') as file_handler:
     packages = file_handler.read().splitlines()
 
 # Metadata goes in setup.cfg. These are here for GitHub's dependency graph.
