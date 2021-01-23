@@ -85,14 +85,14 @@ Use the checklist below to customize this template for your project's need:
 - [ ] Update all `[metadata]` in `setup.cfg` (see also <https://pypi.org/classifiers/>
       for a full list of classifiers)
 - [ ] Configure your package name and version number in `src/__init__.py`
-- [ ] Configure `requirements/common.txt` and `requirements/dev.txt`
+- [ ] Configure `requirements/release.txt` and `requirements/dev.txt`
 - [ ] Edit `MANIFEST.in` if necessary
 - [ ] Check `.gitignore` and add/remove items from this list (e.g. name of your
       virtual environment)
 - [ ] Update `.gitattributes` (the default configuration here should be fine as is)
 - [ ] Choose a different license (uses GPLv3 by default)
 - [ ] Update (or remove) `.markdownlint.json`
-- [ ] Add custom `yaml` files for CI/CD in `.github`
+- [ ] Add custom `yaml` files for CI/CD in `.github` and edit the issues templates
 - [ ] Rewrite this readme file
 
 </details>
