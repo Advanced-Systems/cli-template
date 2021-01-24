@@ -2,5 +2,8 @@ include CHANGELOG.md
 include LICENSE
 
 recursive-include src/data *.json
+recursive-include requirements *.txt
 
+exclude *.ps1
 exclude test.py
+exclude .markdown-lint.json
