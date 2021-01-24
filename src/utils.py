@@ -45,7 +45,7 @@ def print_dict(title_left: str, title_right: str, table: dict) -> None:
     """
     Print a flat dictionary as table with two column titles.
     """
-    table = {str(k): str(v) for k,v in table.items()}
+    table = {str(key): str(value) for key, value in table.items()}
     invert = lambda x: -x + (1 + len(max(chain(table.keys(), [title_left]), key=len)) // 8)
     tabs = lambda string: invert(len(string) // 8) * '\t'
     click.secho(f"\n{title_left}{tabs(title_left)}{title_right}", fg='bright_green')
@@ -56,17 +56,24 @@ def print_dict(title_left: str, title_right: str, table: dict) -> None:
 
 def print_on_success(message: str, verbose: bool=True) -> None:
     """
-    Print a success message if verbose is enabled.
+    Print a formatted success message if verbose is enabled.
     """
     if verbose:
-        click.secho(f"{Style.BRIGHT}{Fore.GREEN}{'[  OK  ]'.ljust(10, ' ')}{Style.RESET_ALL}{message}")
+        click.secho(f"{Style.BRIGHT}{Fore.GREEN}{'[  OK  ]'.ljust(12, ' ')}{Style.RESET_ALL}{message}")
+
+def print_on_warning(message: str, verbose: bool=True) -> None:
+    """
+    Print a formatted warning message if verbose is enabled.
+    """
+    if verbose:
+        click.secho(f"{Fore.YELLOW}{'[ WARNING ]'.ljust(12, ' ')}{Style.RESET_ALL}{message}")
 
 def print_on_error(message: str, verbose: bool=True) -> None:
     """
-    Print an error message if verbose is enabled.
+    Print a formatted error message if verbose is enabled.
     """
     if verbose:
-        click.secho(f"{Style.BRIGHT}{Fore.RED}{'[ ERROR ]'.ljust(10, ' ')}{Style.RESET_ALL}{message}", err=True)
+        click.secho(f"{Style.BRIGHT}{Fore.RED}{'[ ERROR ]'.ljust(12, ' ')}{Style.RESET_ALL}{message}", err=True)
 
 def clear():
     """
