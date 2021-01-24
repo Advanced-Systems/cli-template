@@ -42,13 +42,13 @@ pip install -e .
 cli-template --version
 ```
 
-Alternatively, use
+If you're a project contributor, use
 
 ```powershell
 install.ps1
 ```
 
-to setup your dev environment.
+to setup your development environment.
 
 </details>
 
@@ -94,5 +94,19 @@ Use the checklist below to customize this template for your project's need:
 - [ ] Update (or remove) `.markdownlint.json`
 - [ ] Add custom `yaml` files for CI/CD in `.github` and edit the issues templates
 - [ ] Rewrite this readme file
+
+</details>
+
+## Dev Notes
+
+<details>
+<summary>Commands</summary>
+
+Check manifest. Make sure that you've setup your development environment to run
+this command.
+
+```bash
+check-manifest --create
+```
 
 </details>
