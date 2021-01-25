@@ -93,6 +93,7 @@ Use the checklist below to customize this template for your project's need:
 - [ ] Update `.gitattributes` (the default configuration here should be fine as is)
 - [ ] Update (or remove) `.markdownlint.json`
 - [ ] Add custom `yaml` files for CI/CD in `.github` and edit the issues templates
+- [ ] Update `CHANGELOG.md`
 - [ ] Rewrite this readme file
 
 </details>
