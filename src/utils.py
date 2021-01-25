@@ -1,15 +1,37 @@
 #!/usr/bin/env python3
 
 import json
+import logging
 import os
 import platform
 from importlib.resources import path as resource_path
 from itertools import chain
+from pathlib import Path
 
 import click
 from colorama import Fore, Style
 
+from .__init__ import package_name
+
 #region i/o operations
+
+def log_file_path(package_name=package_name) -> Path:
+    """
+    Make a `package_name` folder in the user's home directory, create a log
+    file (if there is none, else use the existsing one) and return its path.
+    """
+    directory = Path.home().joinpath(package_name)
+    directory.mkdir(parents=True, exist_ok=True)
+    log_file = directory.joinpath(f"{package_name}.log")
+    log_file.touch(exist_ok=True)
+    return log_file
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+formatter = logging.Formatter('[%(asctime)s]::[%(levelname)s]::[%(name)s] - %(message)s')
+file_handler = logging.FileHandler(log_file_path("cli-template"))
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
 
 def read_configuration(resource: str, package: str) -> dict:
     """
