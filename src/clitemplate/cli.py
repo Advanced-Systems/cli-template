@@ -12,12 +12,22 @@ from . import core, utils
 from .__init__ import __version__, package_name
 
 
-@click.group(invoke_without_command=True)
-@click.version_option(version=__version__, prog_name=package_name)
+@click.group(invoke_without_command=True, help=style("A modern CLI template for python scripts.", fg='bright_magenta'))
+@click.version_option(version=__version__, prog_name=package_name, help=style("Show the version and exit.", fg='yellow'))
+@click.option('--read-log', is_flag=True, default=False, help=style("Read the log file", fg='yellow'))
 @click.pass_context
-def cli(ctx):
+def cli(ctx, read_log):
     ctx.ensure_object(dict)
     ctx.obj['CONFIG'] = utils.read_configuration('clitemplate.data', 'config.json')
+
+    if read_log:
+        click.secho("\nLOG FILE CONTENT\n", fg='bright_magenta')
+        with open(utils.log_file_path(), mode='r', encoding='utf-8') as file_handler:
+            log = file_handler.readlines()
+            for line in log:
+                text = line.strip('\n').split(' - ')
+                click.secho(text[0], fg='yellow', nl=False)
+                click.echo(f" - {text[1]}")
 
 @cli.command(help=style("Configure default application settings.", fg='bright_green'))
 @click.option('--message', type=click.STRING, help=style("Store a new message in configuration file.", fg='yellow'))
