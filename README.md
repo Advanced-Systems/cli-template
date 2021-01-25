@@ -60,7 +60,7 @@ to setup your development environment.
 Using this template requires you to understand the project hierarchy, so here's
 a quick rundown on the most important points:
 
-1. `src/` contains all code not directly related to packaging
+1. `src/clitemplate` contains all code not directly related to packaging
 2. `__init__.py` holds your version number, new releases should bump this value
    in accordance with [semantic versioning](https://semver.org/)
 3. `__main__.py` is the entry point of your application, you shouldn't need
@@ -82,12 +82,14 @@ a quick rundown on the most important points:
 
 Use the checklist below to customize this template for your project's need:
 
-- [ ] Configure your package name and version number in `src/__init__.py`
+- [ ] Rename `src/clitemplate` to `src/{new_project_name}`
+- [ ] Configure your package name and version number in `__init__.py`
 - [ ] Update all meta data in `setup.py` (see also <https://pypi.org/classifiers/>
-      for a full list of classifiers)
+      for a full list of classifiers) and rename `src/clitemplate/__init__.py` to
+      `src/{new_project_name}/__init__.py` on line 8
 - [ ] Choose a different license (uses GPLv3 by default)
 - [ ] Configure `requirements/release.txt` and `requirements/dev.txt`
-- [ ] Edit `MANIFEST.in` if necessary (see also `src/data` for resource assets)
+- [ ] Edit `MANIFEST.in` if necessary (see also `src/{new_project_name}/data` for static resource)
 - [ ] Open `.gitignore` and add/remove items from this list (e.g. name of your
       virtual environment)
 - [ ] Update `.gitattributes` (the default configuration here should be fine as is)
