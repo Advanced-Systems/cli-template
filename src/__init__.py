@@ -2,4 +2,5 @@
 
 __version__ = "0.0.1"
 package_name = "cli-template"
-python_major, python_minor = (3, 8)
+python_major = "3"
+python_minor = "8"
