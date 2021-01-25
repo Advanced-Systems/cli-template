@@ -17,7 +17,7 @@ from .__init__ import __version__, package_name
 @click.pass_context
 def cli(ctx):
     ctx.ensure_object(dict)
-    ctx.obj['CONFIG'] = utils.read_configuration('src.data', 'config.json')
+    ctx.obj['CONFIG'] = utils.read_configuration('clitemplate.data', 'config.json')
 
 @cli.command(help=style("Configure default application settings.", fg='bright_green'))
 @click.option('--message', type=click.STRING, help=style("Store a new message in configuration file.", fg='yellow'))
@@ -29,7 +29,7 @@ def config(ctx, message, list, reset):
 
     if message:
         config['Message'] = message
-        utils.write_configuration('src.data', 'config.json', config)
+        utils.write_configuration('clitemplate.data', 'config.json', config)
 
     if list:
         click.secho("\nApplication Settings", fg='bright_magenta')
@@ -37,7 +37,7 @@ def config(ctx, message, list, reset):
         return
 
     if reset:
-        utils.reset_configuration('src.data', 'config.json')
+        utils.reset_configuration('clitemplate.data', 'config.json')
         return
 
 @cli.command(help=style("Simple test command.", fg='bright_green'))

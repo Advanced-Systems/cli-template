@@ -15,21 +15,21 @@ from .__init__ import package_name
 
 #region i/o operations
 
-def log_file_path(package_name=package_name) -> Path:
+def log_file_path(target_dir=package_name) -> Path:
     """
     Make a `package_name` folder in the user's home directory, create a log
     file (if there is none, else use the existsing one) and return its path.
     """
-    directory = Path.home().joinpath(package_name)
+    directory = Path.home().joinpath(target_dir)
     directory.mkdir(parents=True, exist_ok=True)
-    log_file = directory.joinpath(f"{package_name}.log")
+    log_file = directory.joinpath(f"{target_dir}.log")
     log_file.touch(exist_ok=True)
     return log_file
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 formatter = logging.Formatter('[%(asctime)s]::[%(levelname)s]::[%(name)s] - %(message)s')
-file_handler = logging.FileHandler(log_file_path("cli-template"))
+file_handler = logging.FileHandler(log_file_path())
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 
