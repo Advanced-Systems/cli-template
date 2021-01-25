@@ -1,10 +1,16 @@
 #!/usr/bin/env python3
 
+import re
 import sys
 
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
-from src.__init__ import __version__, package_name, python_major, python_minor
+with open("src/__init__.py", encoding='utf8') as file_handler:
+    lines = file_handler.read()
+    version = re.search(r'__version__ = "(.*?)"', lines).group(1)
+    package_name = re.search(r'package_name = "(.*?)"', lines).group(1)
+    python_major = int(re.search(r'python_major = "(.*?)"', lines).group(1))
+    python_minor = int(re.search(r'python_minor = "(.*?)"', lines).group(1))
 
 if package_name == 'cli-template':
     print("\033[93mWARNING: You should rename the default package name.\033[0m")
@@ -31,14 +37,16 @@ setup(
     author='hentai-chan',
     author_email="dev.hentai-chan@outlook.com",
     name=package_name,
-    version=__version__,
+    version=version,
     description="A modern CLI template for python scripts.",
     long_description=long_description,
     long_description_content_type='text/markdown',
     url="https://github.com/Advanced-Systems/cli-template",
     project_urls={
+        'Documentation': "https://github.com/Advanced-Systems/cli-template/blob/master/README.md",
         'Source Code': "https://github.com/Advanced-Systems/cli-template",
         'Bug Reports': "https://github.com/Advanced-Systems/cli-template/issues",
+        'Change Log': "https://github.com/Advanced-Systems/cli-template/blob/master/CHANGELOG.md"
     },
     python_requires=">=%d.%d" % (python_major, python_minor),
     install_requires=packages,
@@ -47,12 +55,10 @@ setup(
         'test': ['pytest']
     },
     include_package_data=True,
-    package_dir={'': 'src'},
-    packages=find_packages(where='src'),
-    entry_points='''
-        [console_scripts]
-        %s=src.__main__:cli
-    ''' % package_name,
+    py_module=[package_name],
+    entry_points={
+        'console_scripts': ['%s=src.__main__:cli' % package_name]
+    },
     classifiers=[
         'Development Status :: 3 - Alpha',
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
@@ -68,4 +74,4 @@ setup(
 )
 
 wheel_name = package_name.replace('-', '_') if '-' in package_name else package_name
-print("\033[92mSetup is complete. Run 'python -m pip install dist/%s-%s-py%d-none-any.whl' to install this wheel.\033[0m" % (wheel_name, __version__, python_major))
+print("\033[92mSetup is complete. Run 'python -m pip install dist/%s-%s-py%d-none-any.whl' to install this wheel.\033[0m" % (wheel_name, version, python_major))
