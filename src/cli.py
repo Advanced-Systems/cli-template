@@ -8,8 +8,8 @@ try:
 except ImportError:
     pass
 
-from src import core, utils
-from src.__init__ import __version__, package_name
+from . import core, utils
+from .__init__ import __version__, package_name
 
 
 @click.group(invoke_without_command=True)
