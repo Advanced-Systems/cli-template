@@ -5,14 +5,14 @@ import sys
 
 from setuptools import find_packages, setup
 
-with open("src/__init__.py", encoding='utf8') as file_handler:
+with open("src/clitemplate/__init__.py", encoding='utf8') as file_handler:
     lines = file_handler.read()
     version = re.search(r'__version__ = "(.*?)"', lines).group(1)
     package_name = re.search(r'package_name = "(.*?)"', lines).group(1)
     python_major = int(re.search(r'python_major = "(.*?)"', lines).group(1))
     python_minor = int(re.search(r'python_minor = "(.*?)"', lines).group(1))
 
-if package_name == 'cli-template':
+if package_name == 'clitemplate':
     print("\033[93mWARNING: You should rename the default package name.\033[0m")
 
 try:
@@ -55,9 +55,10 @@ setup(
         'test': ['pytest']
     },
     include_package_data=True,
-    py_module=[package_name],
+    package_dir={'': 'src'},
+    packages=find_packages(where='src'),
     entry_points={
-        'console_scripts': ['%s=src.__main__:cli' % package_name]
+        'console_scripts': ['%s=%s.__main__:cli' % (package_name, package_name)]
     },
     classifiers=[
         'Development Status :: 3 - Alpha',
