@@ -1,7 +1,7 @@
 include CHANGELOG.md
 include LICENSE
 
-recursive-include src/data *.json
+recursive-include src/clitemplate/data *.json
 recursive-include requirements *.txt
 
 exclude *.ps1
