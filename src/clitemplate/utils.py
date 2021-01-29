@@ -15,9 +15,9 @@ from .__init__ import package_name
 
 #region i/o operations
 
-def log_file_path(target_dir=package_name) -> Path:
+def log_file_path(target_dir: str) -> Path:
     """
-    Make a `package_name` folder in the user's home directory, create a log
+    Make a `target_dir` folder in the user's home directory, create a log
     file (if there is none, else use the existsing one) and return its path.
     """
     directory = Path.home().joinpath(target_dir)
@@ -27,37 +27,71 @@ def log_file_path(target_dir=package_name) -> Path:
     return log_file
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-formatter = logging.Formatter('[%(asctime)s]::[%(levelname)s]::[%(name)s] - %(message)s')
-file_handler = logging.FileHandler(log_file_path())
+logger.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s::%(levelname)s::%(name)s::%(message)s', datefmt='%d-%m-%y %H:%M:%S')
+file_handler = logging.FileHandler(log_file_path(target_dir=package_name))
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 
-def read_configuration(resource: str, package: str) -> dict:
+def read_log() -> None:
+    """
+    Read color-formatted log file content from the speedtest module.
+    """
+    color_map = {
+        'NOTSET': 'white',
+        'DEBUG': 'bright_blue',
+        'INFO': 'yellow',
+        'WARNING': 'bright_magenta',
+        'ERROR': 'red',
+        'CRITICAL': 'bright_red'
+    }
+    with open(log_file_path(target_dir=package_name), mode='r', encoding='utf-8') as file_handler:
+        log = file_handler.readlines()
+
+        if not log:
+            print_on_warning("Operation suspended: log file is empty.")
+            return
+
+        click.secho("\nLOG FILE CONTENT\n", fg='bright_magenta')
+
+        for line in log:
+            entry = line.strip('\n').split('::')
+            timestamp, levelname, name, message = entry[0], entry[1], entry[2], entry[3]
+            click.secho(f"[{timestamp}] ", fg='cyan', nl=False)
+            click.secho(f"@{name} ", nl=False)
+            tabs = '\t\t' if levelname == 'INFO' else '\t'
+            click.secho(f"{levelname}{tabs}", fg=color_map[levelname], blink=(levelname=='CRITICAL'), nl=False)
+            click.secho(message)
+
+def get_resource_path(package: str, resource: str) -> Path:
+    """
+    Get the path to a `resource` located in `package`.
+    """
+    with resource_path(package, resource) as resource_handler:
+        return Path(resource_handler)
+
+def read_resource(package: str, resource: str) -> dict:
     """
     Return the content of `package` (a JSON file located in `resource`) as dictionary.
     """
-    with resource_path(resource, package) as resource_handler:
-         with open(resource_handler, mode='r', encoding='utf-8') as file_handler:
-             return json.load(file_handler)
+    with open(get_resource_path(package, resource), mode='r', encoding='utf-8') as file_handler:
+        return json.load(file_handler)
 
-def write_configuration(resource: str, package: str, params: dict) -> None:
+def write_resource(resource: str, package: str, params: dict) -> None:
     """
     Merge `params` with the content of `package` (located in `resource`) and write
     the result of this operation to disk.
     """
-    config = read_configuration(resource, package)
-    with resource_path(resource, package) as resource_handler:
-        with open(resource_handler, mode='w', encoding='utf-8') as file_handler:
-            json.dump({**config, **params}, file_handler)
+    config = read_resource(resource, package)
+    with open(get_resource_path(package, resource), mode='w', encoding='utf-8') as file_handler:
+        json.dump({**config, **params}, file_handler)
 
-def reset_configuration(resource: str, package: str) -> None:
+def reset_resource(resource: str, package: str) -> None:
     """
     Reset the content of `package` (a JSON file located in `resource`).
     """
-    with resource_path(resource, package) as resource_handler:
-        with open(resource_handler, mode='w', encoding='utf-8') as file_handler:
-            json.dump({}, file_handler)
+    with open(get_resource_path(package, resource), mode='w', encoding='utf-8') as file_handler:
+        json.dump({}, file_handler)
 
 #endregion
 
