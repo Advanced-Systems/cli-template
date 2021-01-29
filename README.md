@@ -8,7 +8,7 @@
 
 <p align="center">
     <a href="https://github.com/hentai-chan/weather" title="Release Version">
-        <img src="https://img.shields.io/badge/Release-0.0.1%20-blue">
+        <img src="https://img.shields.io/badge/Release-0.0.2%20-blue">
     </a>
     <a title="Supported Python Versions">
         <img src="https://img.shields.io/badge/Python-3.8%20%7C%203.9%20-blue">
@@ -33,7 +33,7 @@ using `click` for parsing command line arguments, but any other library (like
 Although this package is ready to go live on PyPI, you can still serve this locally
 by running
 
-```bash
+```cli
 # create virtual env and install dependencies
 python -m venv venv/
 source venv/bin/activate
@@ -108,8 +108,18 @@ Use the checklist below to customize this template for your project's need:
 Check manifest. Make sure that you've setup your development environment to run
 this command.
 
-```bash
+```cli
 check-manifest --create
 ```
 
 </details>
+
+## Report an Issue
+
+Did something went wrong? Copy and paste the information from
+
+```cli
+clitemplate log --read
+```
+
+to file a new bug report.
