@@ -5,7 +5,9 @@ import sys
 
 from setuptools import find_packages, setup
 
-with open("src/clitemplate/__init__.py", encoding='utf8') as file_handler:
+print("reading meta data")
+
+with open("src/clitemplate/__init__.py", encoding='utf-8') as file_handler:
     lines = file_handler.read()
     version = re.search(r'__version__ = "(.*?)"', lines).group(1)
     package_name = re.search(r'package_name = "(.*?)"', lines).group(1)
@@ -28,6 +30,8 @@ with open("requirements/release.txt", mode='r', encoding='utf-8') as requirement
 with open("requirements/dev.txt", mode='r', encoding='utf-8') as requirements:
     dev_packages = requirements.read().splitlines()
 
+print("reading readme file")
+
 with open("README.md", mode='r', encoding='utf-8') as readme:
     long_description = readme.read()
 
@@ -46,7 +50,7 @@ setup(
         'Documentation': "https://github.com/Advanced-Systems/cli-template/blob/master/README.md",
         'Source Code': "https://github.com/Advanced-Systems/cli-template",
         'Bug Reports': "https://github.com/Advanced-Systems/cli-template/issues",
-        'Change Log': "https://github.com/Advanced-Systems/cli-template/blob/master/CHANGELOG.md"
+        'Changelog': "https://github.com/Advanced-Systems/cli-template/blob/master/CHANGELOG.md"
     },
     python_requires=">=%d.%d" % (python_major, python_minor),
     install_requires=packages,
