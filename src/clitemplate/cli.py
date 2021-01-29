@@ -11,25 +11,33 @@ except ImportError:
 from . import core, utils
 from .__init__ import __version__, package_name
 
+CONTEXT_SETTINGS = dict(max_content_width=120)
 
-@click.group(invoke_without_command=True, help=style("A modern CLI template for python scripts.", fg='bright_magenta'))
+@click.group(invoke_without_command=True, context_settings=CONTEXT_SETTINGS, help=style("A modern CLI template for python scripts.", fg='bright_magenta'))
 @click.version_option(version=__version__, prog_name=package_name, help=style("Show the version and exit.", fg='yellow'))
-@click.option('--read-log', is_flag=True, default=False, help=style("Read the log file", fg='yellow'))
 @click.pass_context
-def cli(ctx, read_log):
+def cli(ctx):
     ctx.ensure_object(dict)
-    ctx.obj['CONFIG'] = utils.read_configuration('clitemplate.data', 'config.json')
+    ctx.obj['CONFIG'] = utils.read_resource('clitemplate.data', 'config.json')
 
-    if read_log:
-        click.secho("\nLOG FILE CONTENT\n", fg='bright_magenta')
-        with open(utils.log_file_path(), mode='r', encoding='utf-8') as file_handler:
-            log = file_handler.readlines()
-            for line in log:
-                text = line.strip('\n').split(' - ')
-                click.secho(text[0], fg='yellow', nl=False)
-                click.echo(f" - {text[1]}")
+@cli.command(help=style("Perform log file operations.", fg='bright_green'), context_settings=CONTEXT_SETTINGS)
+@click.option('--read', is_flag=True, default=False, help=style("Read the log file.", fg='yellow'))
+@click.option('--reset', is_flag=True, default=False, help=style("Reset all log file entries", fg='yellow'))
+@click.option('--path', is_flag=True, default=False, help=style("Get the log file path.", fg='yellow'))
+def log(read, reset, path):
+    if read:
+        utils.read_log()
+        return
 
-@cli.command(help=style("Configure default application settings.", fg='bright_green'))
+    if reset:
+        open(utils.log_file_path(target_dir=package_name), mode='w', encoding='utf-8').close()
+        return
+
+    if path:
+        click.echo(utils.log_file_path(target_dir=package_name))
+        return
+
+@cli.command(context_settings=CONTEXT_SETTINGS, help=style("Configure default application settings.", fg='bright_green'))
 @click.option('--message', type=click.STRING, help=style("Store a new message in configuration file.", fg='yellow'))
 @click.option('--list', is_flag=True, help=style("List all app settings.", fg='yellow'))
 @click.option('--reset', is_flag=True, help=style("Discard all application settings.", fg='yellow'))
@@ -39,7 +47,7 @@ def config(ctx, message, list, reset):
 
     if message:
         config['Message'] = message
-        utils.write_configuration('clitemplate.data', 'config.json', config)
+        utils.write_resource('clitemplate.data', 'config.json', config)
 
     if list:
         click.secho("\nApplication Settings", fg='bright_magenta')
@@ -47,10 +55,10 @@ def config(ctx, message, list, reset):
         return
 
     if reset:
-        utils.reset_configuration('clitemplate.data', 'config.json')
+        utils.reset_resource('clitemplate.data', 'config.json')
         return
 
-@cli.command(help=style("Simple test command.", fg='bright_green'))
+@cli.command(context_settings=CONTEXT_SETTINGS, help=style("Simple test command.", fg='bright_green'))
 def test():    
     click.secho("\nFirst Ten Powers of 2", fg='bright_magenta')
     start, end = 1, 11
