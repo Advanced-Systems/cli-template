@@ -18,9 +18,9 @@ if package_name == 'clitemplate':
     print("\033[93mWARNING: You should rename the default package name.\033[0m")
 
 try:
-    assert (sys.version_info.major == python_major and sys.version_info.minor <= python_minor)
+    assert sys.version_info >= (int(python_major), int(python_minor))
 except AssertionError:
-    raise RuntimeError("\033[91mPython Version %d.%d+ is required!\033[0m" % (python_major, python_minor))
+    raise RuntimeError("\033[91mWeather requires Python %s.%s+ (You have Python %s)\033[0m" % (python_major, python_minor, sys.version))
 
 print("reading dependency file")
 
