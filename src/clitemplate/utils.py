@@ -4,14 +4,20 @@ import json
 import logging
 import os
 import platform
+from collections import namedtuple
 from importlib.resources import path as resource_path
 from itertools import chain
 from pathlib import Path
+from types import FrameType
 
 import click
 from colorama import Fore, Style
+from rich.console import Console
+from rich.table import Table
 
 from .__init__ import package_name
+
+CONSOLE = Console()
 
 #region i/o operations
 
@@ -20,22 +26,26 @@ def log_file_path(target_dir: str) -> Path:
     Make a `target_dir` folder in the user's home directory, create a log
     file (if there is none, else use the existsing one) and return its path.
     """
-    directory = Path.home().joinpath(target_dir)
+    directory = Path(os.path.expandvars('%LOCALAPPDATA%')) if platform.system() == 'Windows' else Path().home()
+    directory = directory.joinpath(f".{target_dir}")
+    directory.mkdir(parents=True, exist_ok=True)
     directory.mkdir(parents=True, exist_ok=True)
     log_file = directory.joinpath(f"{target_dir}.log")
     log_file.touch(exist_ok=True)
     return log_file
 
+LOGFILEPATH = log_file_path(target_dir=package_name)
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s::%(levelname)s::%(name)s::%(message)s', datefmt='%d-%m-%y %H:%M:%S')
-file_handler = logging.FileHandler(log_file_path(target_dir=package_name))
+formatter = logging.Formatter('%(asctime)s::%(levelname)s::%(lineno)d::%(name)s::%(message)s', datefmt='%d-%b-%y %H:%M:%S')
+file_handler = logging.FileHandler(LOGFILEPATH)
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 
 def read_log() -> None:
     """
-    Read color-formatted log file content from the speedtest module.
+    Read color-formatted log file content from the clitemplate module.
     """
     color_map = {
         'NOTSET': 'white',
@@ -45,23 +55,27 @@ def read_log() -> None:
         'ERROR': 'red',
         'CRITICAL': 'bright_red'
     }
-    with open(log_file_path(target_dir=package_name), mode='r', encoding='utf-8') as file_handler:
+    with open(LOGFILEPATH, mode='r', encoding='utf-8') as file_handler:
         log = file_handler.readlines()
 
         if not log:
             print_on_warning("Operation suspended: log file is empty.")
             return
 
-        click.secho("\nLOG FILE CONTENT\n", fg='bright_magenta')
+        table = Table(title="Log File Content")
+        table.add_column('Timestamp', style='cyan')
+        table.add_column('Level Name')
+        table.add_column('File Name')
+        table.add_column('Line Number')
+        table.add_column('Message', style='green')
 
-        for line in log:
-            entry = line.strip('\n').split('::')
-            timestamp, levelname, name, message = entry[0], entry[1], entry[2], entry[3]
-            click.secho(f"[{timestamp}] ", fg='cyan', nl=False)
-            click.secho(f"@{name} ", nl=False)
-            tabs = '\t\t' if levelname == 'INFO' else '\t'
-            click.secho(f"{levelname}{tabs}", fg=color_map[levelname], blink=(levelname=='CRITICAL'), nl=False)
-            click.secho(message)
+        parse = lambda line: line.strip('\n').split('::')
+        Entry = namedtuple('Entry', 'timestamp levelname lineno name message')
+        
+        for entry in [Entry(parse(line)[0], parse(line)[1], parse(line)[2], parse(line)[3], parse(line)[4]) for line in log]:
+            table.add_row(entry.timestamp, f"[bold {color_map[entry.levelname]}]{entry.levelname}", entry.name, entry.lineno, entry.message)
+        
+        CONSOLE.print(table)
 
 def get_resource_path(package: str, resource: str) -> Path:
     """
@@ -130,6 +144,29 @@ def print_on_error(message: str, verbose: bool=True) -> None:
     """
     if verbose:
         click.secho(f"{Style.BRIGHT}{Fore.RED}{'[ ERROR ]'.ljust(12, ' ')}{Style.RESET_ALL}{message}", err=True)
+
+def debug(msg: str, frame: FrameType) -> None:
+    """
+    Helper function for slightly better print debugging. Prints the current line
+    of invocation, a custom `msg` and the source file name as color-formatted string.
+    Set `frame` to `inspect.currentframe()` when you invoke this function.
+
+    Example
+    -------
+    ```
+    import inspect
+
+    # some code
+    debug('Validate incoming data stream.', frame=inspect.currentframe())
+    # ...
+    debug('Enter recursive function.', frame=inspect.currentframe())
+    ```
+
+    Note
+    ----
+    Consider using an IDE with a debugger whenever possible.
+    """
+    print(f"\033[93m[{str(frame.f_lineno).zfill(4)}]\033[0m\t\033[92m{msg}\033[0m (in {Path(frame.f_code.co_filename).name}).")
 
 def clear():
     """
