@@ -7,8 +7,11 @@
 <h1 align="center">Advanced Systems CLI Template</h1>
 
 <p align="center">
-    <a href="https://github.com/hentai-chan/weather" title="Release Version">
+    <a href="https://github.com/Advanced-Systems/cli-template" title="Release Version">
         <img src="https://img.shields.io/badge/Release-0.0.4%20-blue">
+    </a>
+    <a href="https://github.com/Advanced-Systems/cli-template/actions/workflows/python-app.yml" title="Unit Tests">
+        <img src="https://github.com/Advanced-Systems/cli-template/actions/workflows/python-app.yml/badge.svg">
     </a>
     <a title="Supported Python Versions">
         <img src="https://img.shields.io/badge/Python-3.8%20%7C%203.9%20-blue">
