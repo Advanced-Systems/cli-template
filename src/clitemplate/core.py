@@ -9,4 +9,4 @@ def square_function(xmin, xmax) -> map:
     Implement the quadratic function f:[xmin,xmax] ⟶ ℝ, x ↦ x²
     """
     logger.info('Announcing my loyalty to the king')
-    return map(lambda x: int(math.pow(2, x)), range(xmin, xmax+1))
+    return map(lambda x: int(math.pow(x, 2)), range(xmin, xmax+1))
