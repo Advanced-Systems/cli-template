@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
-import click
-from click import style
+import argparse
+import errno
+import sys
 
 try:
     import pretty_errors
@@ -11,55 +12,57 @@ except ImportError:
 from . import core, utils
 from .__init__ import __version__, package_name
 
-CONTEXT_SETTINGS = dict(max_content_width=120)
+CONFIG = utils.read_resource('clitemplate.data', 'config.json')
 
-@click.group(invoke_without_command=True, context_settings=CONTEXT_SETTINGS, help=style("A modern CLI template for python scripts.", fg='bright_magenta'))
-@click.version_option(version=__version__, prog_name=package_name, help=style("Show the version and exit.", fg='yellow'))
-@click.pass_context
-def cli(ctx):
-    ctx.ensure_object(dict)
-    ctx.obj['CONFIG'] = utils.read_resource('clitemplate.data', 'config.json')
+def on_parsing_error():
+    utils.logger.error("an error occurred while trying to parse this command: %s", " ".join(sys.argv))
+    raise NotImplementedError("aborting operation: failed to parse this option")
 
-@cli.command(help=style("Perform log file operations.", fg='bright_green'), context_settings=CONTEXT_SETTINGS)
-@click.option('--read', is_flag=True, default=False, help=style("Read the log file.", fg='yellow'))
-@click.option('--reset', is_flag=True, default=False, help=style("Reset all log file entries", fg='yellow'))
-@click.option('--path', is_flag=True, default=False, help=style("Get the log file path.", fg='yellow'))
-def log(read, reset, path):
-    if read:
-        utils.read_log()
-        return
+def cli():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--version', action='version', version=f"%(prog)s {__version__}")
+    parser.add_argument('--verbose', default=True, action=argparse.BooleanOptionalAction, help='increase output verbosity')
 
-    if reset:
-        open(utils.log_file_path(target_dir=package_name), mode='w', encoding='utf-8').close()
-        return
+    subparser = parser.add_subparsers(dest='command')
 
-    if path:
-        click.echo(utils.log_file_path(target_dir=package_name))
-        return
+    log_parser = subparser.add_parser('log', help="read the log file")
+    log_parser.add_argument('--reset', action='store_true', help="reset all log file entries")
+    log_parser.add_argument('--path', action='store_true', help="return the log file path")
+    log_parser.add_argument('--read', action='store_true', help='read the log file')
 
-@cli.command(context_settings=CONTEXT_SETTINGS, help=style("Configure default application settings.", fg='bright_green'))
-@click.option('--message', type=click.STRING, help=style("Store a new message in configuration file.", fg='yellow'))
-@click.option('--list', is_flag=True, help=style("List all app settings.", fg='yellow'))
-@click.option('--reset', is_flag=True, help=style("Discard all application settings.", fg='yellow'))
-@click.pass_context
-def config(ctx, message, list, reset):
-    config = ctx.obj['CONFIG']
+    config_parser = subparser.add_parser('config', help="read the config file")
+    config_parser.add_argument('--message', type=str, nargs='?', help="store a message in the configuration file")
+    config_parser.add_argument('--list', action='store_true', help="list all app settingspath")
+    config_parser.add_argument('--reset', action='store_true', help='discard all application settings')
 
-    if message:
-        config['Message'] = message
-        utils.write_resource('clitemplate.data', 'config.json', config)
+    test_parser = subparser.add_parser('test', help="simple test command")
 
-    if list:
-        click.secho("\nApplication Settings", fg='bright_magenta')
-        utils.print_dict('Name', 'Value', config)
-        return
+    args = parser.parse_args()
 
-    if reset:
-        utils.reset_resource('clitemplate.data', 'config.json')
-        return
+    if args.command == 'log':
+        if args.reset:
+            open(utils.LOGFILEPATH, mode='w', encoding='utf-8').close()
+        elif args.path:
+            print(utils.LOGFILEPATH)
+        elif args.read:
+            utils.read_log()
+        else:
+            on_parsing_error()
 
-@cli.command(context_settings=CONTEXT_SETTINGS, help=style("Simple test command.", fg='bright_green'))
-def test():    
-    click.secho("\nFirst Ten Powers of 2", fg='bright_magenta')
-    start, end = 1, 11
-    utils.print_dict('X Values', 'Y Values', dict(zip(range(start, end), core.square_function(start, end))))
+    if args.command == 'config':
+        if args.message:
+            print(sys.argv)
+            CONFIG['Message'] = args.message
+            utils.write_resource('clitemplate.data', 'config.json', CONFIG)
+        elif args.list:
+            print("Application Settings")
+            utils.print_dict('Name', 'Value', CONFIG)
+        elif args.reset:
+            utils.reset_resource('clitemplate.data', 'config.json')
+        else:
+            on_parsing_error()
+
+    if args.command == 'test':
+        print("First Ten Powers of 2")
+        start, end = 1, 11
+        utils.print_dict('X Values', 'Y Values', dict(zip(range(start, end), core.square_function(start, end))))

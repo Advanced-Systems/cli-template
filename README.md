@@ -8,7 +8,7 @@
 
 <p align="center">
     <a href="https://github.com/Advanced-Systems/cli-template" title="Release Version">
-        <img src="https://img.shields.io/badge/Release-0.0.4%20-blue">
+        <img src="https://img.shields.io/badge/Release-0.0.5%20-blue">
     </a>
     <a href="https://github.com/Advanced-Systems/cli-template/actions/workflows/python-app.yml" title="Unit Tests">
         <img src="https://github.com/Advanced-Systems/cli-template/actions/workflows/python-app.yml/badge.svg">
@@ -24,9 +24,24 @@
     </a>
 </p>
 
-This is a template repository for CLI scripts written in python. We recommend
-using `click` for parsing command line arguments, but any other library (like
-`argparse`) could be used instead as well.
+This is the starter code for lightweight CLI scripts that implements some common
+features you might want to have in your application:
+
+- organized project structure
+- GitHub Action scripts
+- unit tests
+- exemplary command line interface
+- logging
+- static resource access in-code
+- helper functions for basic terminal formatting
+- pre-configured for deployment to [PyPI](https://pypi.org/)
+
+This repository can also be easily installed with [pipx](https://pypa.github.io/pipx/)
+in a virtual environment following modern best practices:
+
+```bash
+pipx install git+https://github.com/Advanced-Systems/cli-template.git
+```
 
 ## Setup
 
@@ -37,21 +52,14 @@ Although this package is ready to go live on PyPI, you can still serve this loca
 by running
 
 ```cli
-# create virtual env and install dependencies
+# create virtual environment and install dependencies
 python -m venv venv/
 source venv/bin/activate
-pip install -e .
-# test this script
-cli-template --version
+pip install -e . && pip install -r requirements/dev.txt
+# run unit tests and read the log file
+pytest --verbose
+clitemplate log --read
 ```
-
-If you're a project contributor, use
-
-```powershell
-install.ps1
-```
-
-to setup your development environment.
 
 </details>
 
@@ -68,8 +76,8 @@ a quick rundown on the most important points:
    in accordance with [semantic versioning](https://semver.org/)
 3. `__main__.py` is the entry point of your application, you shouldn't need
    to change anything here
-4. `cli.py` defines your command line interface (CLI), but the business logic
-   of your application should be placed in a separate file
+4. `cli.py` defines your CLI, but the business logic of your application should
+   be placed in a separate file
 5. `utils.py` contains auxillary methods for pretty terminal output and I/O operations
 6. `core.py` defines your custom methods and serves as the backbone of your
    application
@@ -91,13 +99,10 @@ Use the checklist below to customize this template for your project's need:
       for a full list of classifiers) and rename `src/clitemplate/__init__.py` to
       `src/{new_project_name}/__init__.py` on line 8
 - [ ] Choose a different license (uses GPLv3 by default)
-- [ ] Configure `requirements/release.txt` and `requirements/dev.txt`
-- [ ] Edit `MANIFEST.in` if necessary (see also `src/{new_project_name}/data` for static resource)
-- [ ] Open `.gitignore` and add/remove items from this list (e.g. name of your
-      virtual environment)
-- [ ] Update `.gitattributes` (the default configuration here should be fine as is)
-- [ ] Update (or remove) `.markdownlint.json`
-- [ ] Add custom `yaml` files for CI/CD in `.github` and edit the issues templates
+- [ ] Define new dependencies in `requirements/release.txt` and `requirements/dev.txt`
+- [ ] Edit `MANIFEST.in` if necessary (see also `src/{new_project_name}/data` for static resources)
+- [ ] Configure `.gitignore`
+- [ ] Customize GitHub Actions workflow
 - [ ] Update `CHANGELOG.md`
 - [ ] Rewrite this readme file
 
