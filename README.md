@@ -8,7 +8,7 @@
 
 <p align="center">
     <a href="https://github.com/Advanced-Systems/cli-template" title="Release Version">
-        <img src="https://img.shields.io/badge/Release-0.0.5%20-blue">
+        <img src="https://img.shields.io/badge/Release-1.0.0%20-blue">
     </a>
     <a href="https://github.com/Advanced-Systems/cli-template/actions/workflows/python-app.yml" title="Unit Tests">
         <img src="https://github.com/Advanced-Systems/cli-template/actions/workflows/python-app.yml/badge.svg">
@@ -58,7 +58,7 @@ source venv/bin/activate
 pip install -e . && pip install -r requirements/dev.txt
 # run unit tests and read the log file
 pytest --verbose
-clitemplate log --read
+clitemplate log --list
 ```
 
 </details>
@@ -72,17 +72,18 @@ Using this template requires you to understand the project hierarchy, so here's
 a quick rundown on the most important points:
 
 1. `src/clitemplate` contains all code not directly related to packaging
-2. `__init__.py` holds your version number, new releases should bump this value
+2. `__init__.py` defines package meta data such as the version number
    in accordance with [semantic versioning](https://semver.org/)
 3. `__main__.py` is the entry point of your application, you shouldn't need
    to change anything here
 4. `cli.py` defines your CLI, but the business logic of your application should
-   be placed in a separate file
+   be placed in a separate file; for the sake of simplicity it's called `core.py`
 5. `utils.py` contains auxillary methods for pretty terminal output and I/O operations
 6. `core.py` defines your custom methods and serves as the backbone of your
    application
 7. Dependencies are defined in `requirements/`. Use `release.txt` for production,
-   and `dev.txt` for developer tool dependencies
+   and `dev.txt` for developer tool dependencies; workflow files should use `dev.txt`
+   to install this application
 
 </details>
 
@@ -98,8 +99,7 @@ Use the checklist below to customize this template for your project's need:
 - [ ] Update all meta data in `setup.py` (see also <https://pypi.org/classifiers/>
       for a full list of classifiers) and rename `src/clitemplate/__init__.py` to
       `src/{new_project_name}/__init__.py` on line 8
-- [ ] Choose a different license (uses GPLv3 by default)
-- [ ] Define new dependencies in `requirements/release.txt` and `requirements/dev.txt`
+- [ ] Define new dependencies in `requirements/release.txt` and `requirements/dev.txt` as you see fit
 - [ ] Edit `MANIFEST.in` if necessary (see also `src/{new_project_name}/data` for static resources)
 - [ ] Configure `.gitignore`
 - [ ] Customize GitHub Actions workflow
@@ -127,7 +127,7 @@ check-manifest --create
 Did something went wrong? Copy and paste the information from
 
 ```cli
-clitemplate log --read
+clitemplate log --list
 ```
 
 to file a new bug report.
