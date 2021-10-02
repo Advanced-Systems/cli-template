@@ -4,13 +4,16 @@ import json
 import logging
 import os
 import platform
-from collections import namedtuple
-from importlib.resources import path as resource_path
+import sys
 from itertools import chain
+from json.decoder import JSONDecodeError
 from pathlib import Path
 from types import FrameType
+from typing import Dict, Union
 
+from . import config
 from .__init__ import package_name
+from .config import BRIGHT, CYAN, DIM, GREEN, NORMAL, RED, RESET_ALL, YELLOW
 
 #region logging and resource access
 
@@ -24,76 +27,44 @@ def get_config_dir() -> Path:
         'Linux': Path.home().joinpath('.config')
     }[platform.system()].joinpath(package_name)
 
-def get_logfile_path() -> Path:
+def get_resource_path(filename: Union[str, Path]) -> Path:
     """
     Return a platform-specific log file path.
     """
     config_dir = get_config_dir()
     config_dir.mkdir(parents=True, exist_ok=True)
-    log_file = config_dir.joinpath("error.log")
-    log_file.touch(exist_ok=True)
-    return log_file
-
-LOGFILEPATH = get_logfile_path()
+    resource = config_dir.joinpath(filename)
+    resource.touch(exist_ok=True)
+    return resource
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 formatter = logging.Formatter('%(asctime)s::%(levelname)s::%(lineno)d::%(name)s::%(message)s', datefmt='%Y-%m-%d %H:%M:%S')
-file_handler = logging.FileHandler(get_logfile_path())
+file_handler = logging.FileHandler(get_resource_path(config.LOGFILE))
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 
-def read_log() -> None:
+def read_json_file(filename: Union[str, Path]) -> Dict:
     """
-    Return the content of the log file from the lolicon module.
+    Read `filename` and, if this file is empty, return an empty dictionary in its place.
     """
-    with open(LOGFILEPATH, mode='r', encoding='utf-8') as file_handler:
-        log = file_handler.readlines()
+    with open(get_resource_path(filename), mode='r', encoding='utf-8') as file_handler:
+        try:
+            return json.load(file_handler)
+        except JSONDecodeError:
+            return dict()
 
-        if not log:
-            print_on_warning("Operation suspended: nothing to read because the log file is empty")
-            return
-
-        parse = lambda line: line.strip('\n').split('::')
-        Entry = namedtuple('Entry', 'timestamp levelname lineno name message')
-
-        tabulate = "{:<7} {:<8} {:<30} {:<30}".format
-
-        print(f"\033[32m{tabulate('Line', 'Level', 'File Name', 'Message')}\033[0m")
-
-        for line in log:
-            entry = Entry(parse(line)[0], parse(line)[1], parse(line)[2], parse(line)[3], parse(line)[4])
-            print(tabulate(entry.lineno.zfill(4), entry.levelname, entry.name, entry.message))
-
-def get_resource_path(package: str, resource: str) -> Path:
+def write_json_file(filename: Union[str, Path], params: dict) -> None:
     """
-    Get the path to a `resource` located in `package`.
+    Save the data in `params` as a JSON file by creating an union of pre-existing data (if any).
     """
-    with resource_path(package, resource) as resource_handler:
-        return Path(resource_handler)
-
-def read_resource(package: str, resource: str) -> dict:
-    """
-    Return the content of `package` (a JSON file located in `resource`) as dictionary.
-    """
-    with open(get_resource_path(package, resource), mode='r', encoding='utf-8') as file_handler:
-        return json.load(file_handler)
-
-def write_resource(package: str, resource: str, params: dict) -> None:
-    """
-    Merge `params` with the content of `package` (located in `resource`) and write
-    the result of this operation to disk.
-    """
-    config = read_resource(package, resource)
-    with open(get_resource_path(package, resource), mode='w', encoding='utf-8') as file_handler:
+    config = read_json_file(filename)
+    with open(get_resource_path(filename), mode='w', encoding='utf-8') as file_handler:
         json.dump({**config, **params}, file_handler)
+        file_handler.write('\n')
 
-def reset_resource(package: str, resource) -> None:
-    """
-    Reset the content of `package` (a JSON file located in `resource`).
-    """
-    with open(get_resource_path(package, resource), mode='w', encoding='utf-8') as file_handler:
-        json.dump({}, file_handler)
+def reset_file(filename: Union[str, Path]) -> None:
+    open(get_resource_path(filename), mode='w', encoding='utf-8').close()
 
 #endregion logging and resource access
 
@@ -106,10 +77,10 @@ def print_dict(title_left: str, title_right: str, table: dict) -> None:
     table = {str(key): str(value) for key, value in table.items()}
     invert = lambda x: -x + (1 + len(max(chain(table.keys(), [title_left]), key=len)) // 8)
     tabs = lambda string: invert(len(string) // 8) * '\t'
-    print(f"\n\033[32m{title_left}{tabs(title_left)}{title_right}\033[0m")
-    print(f"{len(title_left) * '-'}{tabs(title_left)}{len(title_right) * '-'}")
+    print('\n' + BRIGHT + GREEN + title_left + tabs(title_left) + title_right + RESET_ALL)
+    print((len(title_left) * '-') + tabs(title_left) + (len(title_right) * '-'))
     for key, value in table.items():
-        print(f"{key}{tabs(key)}{value}")
+        print(key + tabs(key) + value)
     print()
 
 def print_on_success(message: str, verbose: bool=True) -> None:
@@ -117,21 +88,21 @@ def print_on_success(message: str, verbose: bool=True) -> None:
     Print a formatted success message if verbose is enabled.
     """
     if verbose:
-        print(f"\033[32m{'[  OK  ]'.ljust(12, ' ')}\033[0m{message}")
+        print(BRIGHT + GREEN + "[  OK  ]".ljust(12, ' ') + RESET_ALL + message)
 
 def print_on_warning(message: str, verbose: bool=True) -> None:
     """
     Print a formatted warning message if verbose is enabled.
     """
     if verbose:
-        print(f"\033[33m{'[ WARNING ]'.ljust(12, ' ')}\033[0m{message}")
+        print(BRIGHT + YELLOW + "[ WARNING ]".ljust(12, ' ') + RESET_ALL + message)
 
 def print_on_error(message: str, verbose: bool=True) -> None:
     """
     Print a formatted error message if verbose is enabled.
     """
     if verbose:
-        print(f"\033[31m{'[ ERROR ]'.ljust(12, ' ')}\033[0m{message}", err=True)
+        print(BRIGHT + RED + "[ ERROR ]".ljust(12, ' ') + RESET_ALL + message, file=sys.stderr)
 
 def debug(msg: str, frame: FrameType) -> None:
     """
@@ -151,7 +122,7 @@ def debug(msg: str, frame: FrameType) -> None:
     ----
     Consider using an IDE with a debugger whenever possible.
     """
-    print(f"\033[93m[{str(frame.f_lineno).zfill(4)}]\033[0m\t\033[92m{msg}\033[0m (in {Path(frame.f_code.co_filename).name}).")
+    print(BRIGHT + YELLOW + '[' + str(frame.f_lineno).zfill(4) + ']' + RESET_ALL + '\t' + msg + " (in '%s').", Path(frame.f_code.co_filename).name)
 
 def clear():
     """
