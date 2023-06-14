@@ -15,12 +15,12 @@ with open("src/clitemplate/__init__.py", encoding='utf-8') as file_handler:
     python_minor = int(re.search(r'python_minor = "(.*?)"', lines).group(1))
 
 if package_name == 'clitemplate':
-    print("\033[93mWARNING: You should rename the default package name.\033[0m")
+    print("WARNING: You should rename the default package name.")
 
 try:
     assert sys.version_info >= (int(python_major), int(python_minor))
 except AssertionError:
-    raise RuntimeError("\033[91mWeather requires Python %s.%s+ (You have Python %s)\033[0m" % (python_major, python_minor, sys.version))
+    raise RuntimeError("%s requires Python %s.%s+ (You have Python %s)" % (package_name, python_major, python_minor, sys.version))
 
 print("reading dependency file")
 
@@ -38,8 +38,8 @@ with open("README.md", mode='r', encoding='utf-8') as readme:
 print("running %s's setup routine" % package_name)
 
 setup(
-    author='hentai-chan',
-    author_email="dev.hentai-chan@outlook.com",
+    author='Stefan Greve',
+    author_email="greve.stefan@outlook.jp",
     name=package_name,
     version=version,
     description="A modern CLI template for python scripts.",
@@ -69,8 +69,9 @@ setup(
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Intended Audience :: Developers',
         'Natural Language :: English',
-        'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
         'Operating System :: OS Independent',
         'Topic :: Terminals',
         'Topic :: Utilities',
@@ -79,4 +80,4 @@ setup(
 )
 
 wheel_name = package_name.replace('-', '_') if '-' in package_name else package_name
-print("\033[92mSetup is complete. Run 'python -m pip install dist/%s-%s-py%d-none-any.whl' to install this wheel.\033[0m" % (wheel_name, version, python_major))
+print("Setup is complete. Run 'python -m pip install dist/%s-%s-py%d-none-any.whl' to install this wheel." % (wheel_name, version, python_major))
