@@ -2,6 +2,7 @@ import unittest
 
 from src.clitemplate import commands
 
+
 class TestCore(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

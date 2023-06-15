@@ -5,7 +5,7 @@ import sys
 
 from setuptools import find_packages, setup
 
-print("reading meta data")
+print("[1/5] Reading meta data . . .")
 
 with open("src/clitemplate/__init__.py", encoding='utf-8') as file_handler:
     lines = file_handler.read()
@@ -22,20 +22,20 @@ try:
 except AssertionError:
     raise RuntimeError("%s requires Python %s.%s+ (You have Python %s)" % (package_name, python_major, python_minor, sys.version))
 
-print("reading dependency file")
+print("[2/5] reading dependency file . . .")
 
-with open("requirements/release.txt", mode='r', encoding='utf-8') as requirements:
-    packages = requirements.read().splitlines()
+with open("requirements/release.txt", mode='r', encoding='utf-8') as release_requirements:
+    packages = release_requirements.read().splitlines()
 
-with open("requirements/dev.txt", mode='r', encoding='utf-8') as requirements:
-    dev_packages = requirements.read().splitlines()
+with open("requirements/dev.txt", mode='r', encoding='utf-8') as dev_requirements:
+    dev_packages = dev_requirements.read().splitlines()
 
-print("reading readme file")
+print("[3/5] Reading readme file . . .")
 
 with open("README.md", mode='r', encoding='utf-8') as readme:
     long_description = readme.read()
 
-print("running %s's setup routine" % package_name)
+print("[4/5] Running %s's setup routine . . ." % package_name)
 
 setup(
     author='Stefan Greve',
@@ -80,4 +80,4 @@ setup(
 )
 
 wheel_name = package_name.replace('-', '_') if '-' in package_name else package_name
-print("Setup is complete. Run 'python -m pip install dist/%s-%s-py%d-none-any.whl' to install this wheel." % (wheel_name, version, python_major))
+print("[5/5] Setup is complete. Run 'python -m pip install dist/%s-%s-py%d-none-any.whl' to install this wheel." % (wheel_name, version, python_major))
