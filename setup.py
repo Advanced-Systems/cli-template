@@ -20,7 +20,7 @@ if package_name == "clitemplate":
 try:
     assert sys.version_info >= (int(python_major), int(python_minor))
 except AssertionError:
-    raise RuntimeError("%s requires Python %s.%s+ (You have Python %s)" % (package_name, python_major, python_minor, sys.version))
+    raise RuntimeError(f"{package_name} requires Python {python_major}.{python_minor}+ (You have Python {sys.version})")
 
 print("[2/5] reading dependency file . . .")
 
@@ -35,7 +35,7 @@ print("[3/5] Reading readme file . . .")
 with open("README.md", mode='r', encoding="utf-8") as readme:
     long_description = readme.read()
 
-print("[4/5] Running %s's setup routine . . ." % package_name)
+print(f"[4/5] Running {package_name}'s setup routine . . .")
 
 setup(
     author="Stefan Greve",
@@ -62,7 +62,7 @@ setup(
     package_dir={'': "src"},
     packages=find_packages(where="src"),
     entry_points={
-        "console_scripts": ["%s=%s.__main__:cli" % (package_name, package_name)]
+        "console_scripts": [f"{package_name}={package_name}.__main__:cli"]
     },
     classifiers=[
         "Development Status :: 3 - Alpha",
@@ -80,4 +80,4 @@ setup(
 )
 
 wheel_name = package_name.replace('-', '_') if '-' in package_name else package_name
-print("[5/5] Setup is complete. Run 'python -m pip install dist/%s-%s-py%d-none-any.whl' to install this wheel." % (wheel_name, version, python_major))
+print(f"[5/5] Setup is complete. Run 'python -m pip install dist/{wheel_name}-{version}-py{python_major}-none-any.whl' to install this wheel.")
