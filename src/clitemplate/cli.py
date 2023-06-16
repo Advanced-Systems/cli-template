@@ -3,16 +3,15 @@
 import logging
 
 import click
-from click import Context
 from rich.console import Console
 from rich.table import Table
 
 from .__init__ import __version__, package_name
 from .commands import square_function
-from .config import Config
-from .constants import Files
-from .logger import Logger
-from .utils import Utils
+from .internals.config import Config
+from .internals.constants import Files
+from .internals.logger import Logger
+from .internals.utils import Utils
 
 
 class ContextConfig:

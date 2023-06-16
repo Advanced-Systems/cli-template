@@ -4,7 +4,7 @@ import platform
 from pathlib import Path
 from typing import Union
 
-from .__init__ import package_name
+from ..__init__ import package_name
 
 
 class Utils:
