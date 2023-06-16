@@ -27,7 +27,7 @@ def cli(ctx: Context):
 @click.option("--xmax", type=int, help="Stop value")
 @click.pass_obj
 def square(logger: Logger, xmin: int, xmax: int):
-    logger.log(f"Calling square with values {xmin=},{xmax=}", level=logging.DEBUG)
+    logger.log(f"Calling square with values {xmin=},{xmax=}", console=True, level=logging.DEBUG)
 
     table = Table(title=f"y=x^2")
     table.add_column("x", justify="right", style="yellow")

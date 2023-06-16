@@ -20,4 +20,4 @@ class TestCore(unittest.TestCase):
         result = list(commands.square_function(xmin, xmax))
 
         # assert
-        self.assertEqual(result, [4, 9, 16, 25, 36], msg=f"Range: [{xmin},{xmax}]")
+        self.assertEqual(result, [4, 9, 16, 25, 36], msg=f"Range: [{xmin=},{xmax=}]")
