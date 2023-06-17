@@ -17,10 +17,7 @@
         <img src="https://img.shields.io/badge/Python-3.9%20%7C%203.10%20%7C%203.11%20-blue">
     </a>
     <a href="https://www.gnu.org/licenses/gpl-3.0.en.html" title="License Information" target="_blank" rel="noopener noreferrer">
-        <img src="https://img.shields.io/badge/License-GPLv3-blue.svg">
-    </a>
-    <a href="https://archive.softwareheritage.org/browse/origin/?origin_url=https://github.com/Advanced-Systems/cli-template" title="Software Heritage Archive" target="_blank" rel="noopener noreferrer">
-        <img src="https://archive.softwareheritage.org/badge/origin/https://github.com/Advanced-Systems/cli-template.git/">
+        <img src="https://img.shields.io/badge/License-MIT-blue.svg">
     </a>
 </p>
 
@@ -49,9 +46,37 @@ pip install -e .
 pip install -r requirements/dev.txt
 ```
 
+You can use the `configure.ps1` script in the `scripts` directory to help you
+customize this application:
+
+```powershell
+.\scripts\configure.ps1
+```
+
+Alternatively, you can make these changes yourself by editing the
+`src/clitemplate/__init__.py` file. Note that you should also rename the `clitemplate`
+folder in the `src` directory to match your `package_name`. For terminal applications
+specifically, take into account the following recommendations:
+
+- _use_ short and concise names for CLI programs
+- _avoid_ generic names that could cause a conflict with established standard tools
+- _avoid_ special characters such as `-` or `_` in your application name
+
 ## Basic Usage
 
-TODO
+The starter code implements a standard interface to help you get started with writing
+your own commands:
+
+```powershell
+# the package name also declares the entry point of the application
+# remember: you should always implement the help and version flag
+clitemplate --help
+clitemplate --version
+
+# the square function is implemented as a subcommand here
+# it is considered good practice to provide an optional verbose flag
+clitemplate --verbose square --xmin <int> --xmax <int>
+```
 
 ## Dev Notes
 
@@ -59,5 +84,6 @@ You can also install this project with [`pipx`](https://pypa.github.io/pipx/)
 if you don't want to deploy this project on PyPI:
 
 ```powershell
+python -m pip install pipx
 pipx install git+https://github.com/Advanced-Systems/cli-template.git
 ```
