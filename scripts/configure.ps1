@@ -45,7 +45,7 @@ Write-Information @(
 Write-Step "Configure your project, press enter to continue with default settings"
 
 $Package = Read-Host -Prompt "Package"
-if ($Package -eq [string]::Empty) { $Package = $DefaultPackage }
+if ($Package -eq [string]::Empty) { $Package = "package" }
 
 $Version = Read-Host -Prompt "Version"
 if ($Version -eq [string]::Empty) { $Version = "1.0.0" }
@@ -73,11 +73,11 @@ if ($Url -eq [string]::Empty) {
 #region main script
 
 Write-Step "Creating a new branch"
-git checkout -b dev 2>&1 | Out-Null
+git checkout -b development
 
 Write-Step "Overwriting default meta data . . ."
-$PythonFolder = $([Path]::Join($Root, "src", $DefaultPackage))
-git mv $([Path]::Join($Root, "src", $DefaultPackage)) $PythonFolder
+$PythonFolder = $([Path]::Join($Root, "src", $Package))
+git mv $([Path]::Join($Root, "src", $DefaultPackage)) $PythonFolder 2>&1 | Out-Null
 $InitScript = Get-ChildItem $PythonFolder | Where-Object Name -eq "__init__.py"
 
 Set-VariableInFile -Path $InitScript.FullName -Variable "__version__" -NewValue $Version
