@@ -22,9 +22,6 @@ with open("src/clitemplate/__init__.py", encoding="utf-8") as file_handler:
     python_major = int(re.search(r'python_major = "(.*?)"', lines).group(1))
     python_minor = int(re.search(r'python_minor = "(.*?)"', lines).group(1))
 
-if package_name == "clitemplate":
-    print("WARNING: You should rename the default package name.")
-
 try:
     assert sys.version_info >= (int(python_major), int(python_minor))
 except AssertionError:
