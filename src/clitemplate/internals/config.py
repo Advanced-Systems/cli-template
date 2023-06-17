@@ -22,5 +22,5 @@ class Config:
         with open(self.path, mode='w', encoding=self.encoding) as file_handler:
             self.__config.write(file_handler)
 
-    def get(self,section: str, option: str):
+    def get(self, section: str, option: str):
         return self.__config.get(section, option)
