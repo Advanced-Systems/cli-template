@@ -1,81 +1,57 @@
 #!/usr/bin/env python3
 
-import argparse
-import errno
-import sys
-from collections import namedtuple
+import logging
 
-from . import core, utils
+import click
+from rich.console import Console
+from rich.table import Table
+
 from .__init__ import __version__, package_name
-from .config import CONFIGFILE, LOGFILE, GREEN, RESET_ALL
+from .commands import square_function
+from .internals.config import Config
+from .internals.constants import Files
+from .internals.logger import Logger
+from .internals.utils import Utils
 
 
-def cli():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--version', action='version', version=f"%(prog)s {__version__}")
-    parser.add_argument('--verbose', default=False, action='store_true', help="increase output verbosity")
+class ContextConfig:
+    def __init__(self) -> None:
+        self.verbose = False
+        self.log_path = Utils.get_resource_path(Files.LOG_FILE.value)
+        self.logger = Logger(path=self.log_path, level=logging.DEBUG)
+        self.config_path = Utils.get_resource_path(Files.CONFIG_FILE.value)
+        self.config = Config(self.config_path)
+        self.console = Console()
 
-    subparser = parser.add_subparsers(dest='command')
+pass_config = click.make_pass_decorator(ContextConfig, ensure=True)
 
-    log_parser = subparser.add_parser('log', help="interact with the application log")
-    log_parser.add_argument('--path', action='store_true', help="return the log file path")
-    log_parser.add_argument('--reset', action='store_true', help="purge the log file")
-    log_parser.add_argument('--list', action='store_true', help='read the log file')
+@click.group()
+@click.help_option()
+@click.version_option(version=__version__, package_name=package_name)
+@click.option("--verbose", is_flag=True, help="Print log messages to console")
+@pass_config
+def cli(ctx_cfg: ContextConfig, verbose: bool):
+    ctx_cfg.verbose = verbose
+    ctx_cfg.config.add_section("configuration", {
+        "level": logging.DEBUG,
+    })
+    ctx_cfg.config.save()
 
-    config_parser = subparser.add_parser('config', help="configure default application settings")
-    config_parser.add_argument('--message', type=str, nargs='?', help="store a message in the configuration file")
-    config_parser.add_argument('--path', action='store_true', help="return the config file path")
-    config_parser.add_argument('--reset', action='store_true', help='purge the config file')
-    config_parser.add_argument('--list', action='store_true', help="list all user configuration")
+@cli.command(help="return the image of [xmin, xmax] under the square function")
+@click.option("--xmin", type=int, help="Start value")
+@click.option("--xmax", type=int, help="Stop value")
+@pass_config
+def square(ctx_cfg: ContextConfig, xmin: int, xmax: int):
+    level = int(ctx_cfg.config.get("configuration", "level"))
+    ctx_cfg.logger.log(f"Calling square with values {xmin=},{xmax=}", level, console=ctx_cfg.verbose)
 
-    test_parser = subparser.add_parser('test', help="simple test command")
+    table = Table(title=f"y=x^2")
+    table.add_column("x", justify="right", style="yellow")
+    table.add_column("y", justify="right", style="yellow")
 
-    args = parser.parse_args()
-    config_data = utils.read_json_file(CONFIGFILE)
+    x = iter(range(xmin, xmax+1))
 
-    if args.command == 'log':
-        logfile = utils.get_resource_path(LOGFILE)
+    for y in square_function(xmin, xmax):
+        table.add_row(str(next(x)), str(y))
 
-        if args.path:
-            return logfile
-        if args.reset:
-            utils.reset_file(logfile)
-            return
-        if args.list:
-            with open(logfile, mode='r', encoding='utf-8') as file_handler:
-                log = file_handler.readlines()
-
-                if not log:
-                    utils.print_on_warning("Nothing to read because the log file is empty")
-                    return
-
-                parse = lambda line: line.strip('\n').split('::')
-                Entry = namedtuple('Entry', 'timestamp levelname lineno name message')
-
-                tabulate = "{:<20} {:<5} {:<6} {:<22} {:<20}".format
-
-                print('\n' + GREEN + tabulate('Timestamp', 'Line', 'Level', 'File Name', 'Message') + RESET_ALL)
-
-                for line in log:
-                    entry = Entry(parse(line)[0], parse(line)[1], parse(line)[2], parse(line)[3], parse(line)[4])
-                    print(tabulate(entry.timestamp, entry.lineno.zfill(4), entry.levelname, entry.name, entry.message))
-
-    if args.command == 'config':
-        config_file = utils.get_resource_path(CONFIGFILE)
-
-        if args.message:
-            config_data['UnitSystem'] = args.message
-            utils.write_json_file(config_file, config_data)
-        if args.path:
-            return config_file
-        if args.reset:
-            utils.reset_file(config_file)
-            return
-        if args.list:
-            utils.print_dict('Name', 'Value', config_data)
-            return
-
-    if args.command == 'test':
-        print("\nFirst Ten Powers of 2")
-        start, end = 1, 11
-        utils.print_dict('X Values', 'Y Values', dict(zip(range(start, end), core.square_function(start, end))))
+    ctx_cfg.console.print(table)
