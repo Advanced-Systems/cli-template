@@ -10,7 +10,15 @@ print("[1/5] Reading meta data . . .")
 with open("src/clitemplate/__init__.py", encoding="utf-8") as file_handler:
     lines = file_handler.read()
     version = re.search(r'__version__ = "(.*?)"', lines).group(1)
+    author_name = re.search(r'author_name = "(.*?)"', lines).group(1)
+    author_email = re.search(r'author_email = "(.*?)"', lines).group(1)
     package_name = re.search(r'package_name = "(.*?)"', lines).group(1)
+    description = re.search(r'description = "(.*?)"', lines).group(1)
+    url = re.search(r'url = "(.*?)"', lines).group(1)
+    url_documentation = re.search(r'url_documentation = "(.*?)"', lines).group(1)
+    url_source_code = re.search(r'url_source_code = "(.*?)"', lines).group(1)
+    url_bug_reports = re.search(r'url_bug_reports = "(.*?)"', lines).group(1)
+    url_changelog = re.search(r'url_changelog = "(.*?)"', lines).group(1)
     python_major = int(re.search(r'python_major = "(.*?)"', lines).group(1))
     python_minor = int(re.search(r'python_minor = "(.*?)"', lines).group(1))
 
@@ -38,19 +46,19 @@ with open("README.md", mode='r', encoding="utf-8") as readme:
 print(f"[4/5] Running {package_name}'s setup routine . . .")
 
 setup(
-    author="Stefan Greve",
-    author_email="greve.stefan@outlook.jp",
+    author=author_name,
+    author_email=author_email,
     name=package_name,
     version=version,
-    description="A modern CLI template for python scripts.",
+    description=description,
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/Advanced-Systems/cli-template",
+    url=url,
     project_urls={
-        "Documentation": "https://github.com/Advanced-Systems/cli-template/blob/master/README.md",
-        "Source Code": "https://github.com/Advanced-Systems/cli-template",
-        "Bug Reports": "https://github.com/Advanced-Systems/cli-template/issues",
-        "Changelog": "https://github.com/Advanced-Systems/cli-template/blob/master/CHANGELOG.md"
+        "Documentation": url_documentation,
+        "Source Code": url_source_code,
+        "Bug Reports": url_bug_reports,
+        "Changelog": url_changelog
     },
     python_requires=">=%d.%d" % (python_major, python_minor),
     install_requires=packages,
