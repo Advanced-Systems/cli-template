@@ -3,7 +3,7 @@ import unittest
 from src.clitemplate import commands
 
 
-class TestCore(unittest.TestCase):
+class TestCommands(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         pass
