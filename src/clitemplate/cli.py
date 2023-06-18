@@ -17,11 +17,17 @@ from .internals.utils import Utils
 class ContextConfig:
     def __init__(self) -> None:
         self.verbose = False
-        self.log_path = Utils.get_resource_path(Files.LOG_FILE.value)
-        self.logger = Logger(path=self.log_path, level=logging.DEBUG)
-        self.config_path = Utils.get_resource_path(Files.CONFIG_FILE.value)
-        self.config = Config(self.config_path)
         self.console = Console()
+        self.__default_level = logging.DEBUG
+        self.logger = Logger(path=Utils.get_resource_path(Files.LOG_FILE.value), level=self.__default_level)
+        self.config = Config(Utils.get_resource_path(Files.CONFIG_FILE.value))
+
+        if (self.config.path.exists()): self.config.read(); return
+        self.config.add_section("configuration", {
+            "level": self.__default_level
+        })
+        self.config.save()
+
 
 pass_config = click.make_pass_decorator(ContextConfig, ensure=True)
 
@@ -32,10 +38,6 @@ pass_config = click.make_pass_decorator(ContextConfig, ensure=True)
 @pass_config
 def cli(ctx_cfg: ContextConfig, verbose: bool):
     ctx_cfg.verbose = verbose
-    ctx_cfg.config.add_section("configuration", {
-        "level": logging.DEBUG,
-    })
-    ctx_cfg.config.save()
 
 @cli.command(help="return the image of [xmin, xmax] under the square function")
 @click.option("--xmin", type=int, help="Start value")

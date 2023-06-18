@@ -15,12 +15,15 @@ class Config:
         if settings: self.__config.read_dict(settings)
 
     def add_section(self, section: str, settings: Dict=None) -> None:
-        if settings is None: self.__config.add_section(section)
+        if settings is None: self.__config.add_section(section); return
         self.__config[section] = settings
 
     def save(self) -> None:
         with open(self.path, mode='w', encoding=self.encoding) as file_handler:
             self.__config.write(file_handler)
 
-    def get(self, section: str, option: str):
+    def read(self) -> None:
+        self.__config.read_file(open(self.path, encoding=self.encoding))
+
+    def get(self, section: str, option: str) -> str:
         return self.__config.get(section, option)
