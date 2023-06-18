@@ -7,6 +7,12 @@ function Set-VariableInFile([string] $Path, [string] $Variable, [string] $NewVal
     $Content -replace "^$Variable = (.*?)$", "$Variable = `"$NewValue`"" | Set-Content -Path $Path
 }
 
+function Set-StringInFile([string] $Path, [string] $Name, [string] $OldString, [string] $NewString) {
+    $File = Get-ChildItem -Recurse -Path $Path | Where-Object Name -eq $Name | Select-Object -First 1
+    $Content = Get-Content -Path $File.FullName
+    $Content -replace "$OldString", "$NewString" | Set-Content -Path $File.FullName
+}
+
 function Write-Information([string[]] $Messages) {
     $Line = "*" * 80
     Write-Host $Line -ForegroundColor Green
@@ -95,9 +101,9 @@ $MetaData.GetEnumerator() | ForEach-Object {
     Set-VariableInFile -Path $InitScript.FullName -Variable $_.Key -NewValue $_.Value
 }
 
-$SetupScript = Get-ChildItem -Path $Root | Where-Object Name -eq "setup.py"
-$Content = Get-Content -Path $SetupScript
-$Content -replace "$DefaultPackage", "$Package" | Set-Content -Path $SetupScript
+@("setup.py", "test_commands.py") | ForEach-Object {
+    Set-StringInFile -Path $Root -Name $_ -OldString $DefaultPackage -NewString $MetaData["package_name"]
+}
 
 git add --all
 git commit -m "Configure project meta data"
