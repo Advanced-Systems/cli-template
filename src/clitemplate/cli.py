@@ -18,16 +18,20 @@ class ContextConfig:
     def __init__(self) -> None:
         self.verbose = False
         self.console = Console()
-        self.__default_level = logging.DEBUG
-        self.logger = Logger(path=Utils.get_resource_path(Files.LOG_FILE.value), level=self.__default_level)
         self.config = Config(Utils.get_resource_path(Files.CONFIG_FILE.value))
 
-        if (self.config.path.exists()): self.config.read(); return
-        self.config.add_section("configuration", {
-            "level": self.__default_level
-        })
-        self.config.save()
+        if (self.config.path.exists() and self.config.path.stat().st_size):
+            self.config.read()
+        else:
+            self.config.add_section("configuration", {
+                "level": logging.INFO
+            })
+            self.config.save()
 
+        self.logger = Logger(
+            path=Utils.get_resource_path(Files.LOG_FILE.value),
+            level=int(self.config.get("configuration", "level"))
+        )
 
 pass_config = click.make_pass_decorator(ContextConfig, ensure=True)
 
@@ -44,8 +48,7 @@ def cli(ctx_cfg: ContextConfig, verbose: bool):
 @click.option("--xmax", type=int, help="Stop value")
 @pass_config
 def square(ctx_cfg: ContextConfig, xmin: int, xmax: int):
-    level = int(ctx_cfg.config.get("configuration", "level"))
-    ctx_cfg.logger.log(f"Calling square with values {xmin=},{xmax=}", level, console=ctx_cfg.verbose)
+    ctx_cfg.logger.log(f"Calling square with values {xmin=},{xmax=}", level=logging.DEBUG, console=ctx_cfg.verbose)
 
     table = Table(title=f"y=x^2")
     table.add_column("x", justify="right", style="yellow")
