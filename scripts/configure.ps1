@@ -30,6 +30,7 @@ $global:i = 1
 $global:n = 4
 $Root = git rev-parse --show-toplevel
 $DefaultPackage = "clitemplate"
+$MetaData = @{}
 Push-Location -Path $Root
 
 #region meta data
@@ -46,18 +47,23 @@ Write-Step "Configure your project, press enter to continue with default setting
 
 $Package = Read-Host -Prompt "Package"
 if ($Package -eq [string]::Empty) { $Package = "package" }
+$MetaData.Add("package_name", $Package)
 
 $Version = Read-Host -Prompt "Version"
 if ($Version -eq [string]::Empty) { $Version = "1.0.0" }
+$MetaData.Add("__version__", $Version)
 
 $Author = Read-Host -Prompt "Name"
 if ($Author -eq [string]::Empty) { $Author = git config --global user.name }
+$MetaData.Add("author_name", $Author)
 
 $Email = Read-Host -Prompt "Email"
 if ($Email -eq [string]::Empty) { $Email = git config --global user.email }
+$MetaData.Add("author_email", $Email)
 
 $Description = Read-Host -Prompt "Description"
 if ($Description -eq [string]::Empty) { $Description = "$Package CLI" }
+$MetaData.Add("description", $Description)
 
 $Url = Read-Host -Prompt "GitHub Link"
 if ($Url -eq [string]::Empty) {
@@ -67,6 +73,11 @@ if ($Url -eq [string]::Empty) {
     $Repository = $Tmp[1].Substring(0, $Tmp[1].IndexOf('.'))
     $Url = "https://github.com/$Owner/$Repository"
 }
+$MetaData.Add("url", $Url)
+$MetaData.Add("url_documentation", "$Url/blob/master/README.md")
+$MetaData.Add("url_source_code", $Url)
+$MetaData.Add("url_bug_reports", "$Url/issues")
+$MetaData.Add("url_changelog", "$Url/blob/master/CHANGELOG.md")
 
 #endregion
 
@@ -80,16 +91,9 @@ $PythonFolder = $([Path]::Join($Root, "src", $Package))
 git mv $([Path]::Join($Root, "src", $DefaultPackage)) $PythonFolder 2>&1 | Out-Null
 $InitScript = Get-ChildItem $PythonFolder | Where-Object Name -eq "__init__.py"
 
-Set-VariableInFile -Path $InitScript.FullName -Variable "__version__" -NewValue $Version
-Set-VariableInFile -Path $InitScript.FullName -Variable "author_name" -NewValue $Author
-Set-VariableInFile -Path $InitScript.FullName -Variable "author_email" -NewValue $Email
-Set-VariableInFile -Path $InitScript.FullName -Variable "package_name" -NewValue $Package
-Set-VariableInFile -Path $InitScript.FullName -Variable "description" -NewValue $Description
-Set-VariableInFile -Path $InitScript.FullName -Variable "url" -NewValue $Url
-Set-VariableInFile -Path $InitScript.FullName -Variable "url_documentation" -NewValue "$Url/blob/master/README.md"
-Set-VariableInFile -Path $InitScript.FullName -Variable "url_source_code" -NewValue $Url
-Set-VariableInFile -Path $InitScript.FullName -Variable "url_bug_reports" -NewValue "$Url/issues"
-Set-VariableInFile -Path $InitScript.FullName -Variable "url_changelog" -NewValue "$Url/blob/master/CHANGELOG.md"
+$MetaData.GetEnumerator() | ForEach-Object {
+    Set-VariableInFile -Path $InitScript.FullName -Variable $_.Key -NewValue $_.Value
+}
 
 $SetupScript = Get-ChildItem -Path $Root | Where-Object Name -eq "setup.py"
 $Content = Get-Content -Path $SetupScript
